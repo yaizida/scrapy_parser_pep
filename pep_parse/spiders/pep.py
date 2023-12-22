@@ -1,10 +1,12 @@
 import scrapy
 
+from pep_parse.items import PepParseItem
+
 
 class PepSpider(scrapy.Spider):
     name = 'pep'
-    allowed_domains = ['peps.python.org']
-    start_urls = ['https://peps.python.org/']
+    allowed_domains, start_urls = (['peps.python.org'],
+                                   ['https://peps.python.org/'])
 
     def parse(self, response):
         """собирает ссылки на документы PEP."""
@@ -16,11 +18,14 @@ class PepSpider(scrapy.Spider):
 
     def parse_pep(self, response):
         """парсит страницы с документами и формирует Items."""
-        full_pep_name = response.css('.page-title::text').get().split()
-        number = full_pep_name[1]
-        name_pep = ' '.join(full_pep_name[3:])
-        yield {
-            'number': int(number),
-            'name': name_pep,
-            'status': response.css('abbr::text').get()
+        _, number, _, *name = response.css(
+            'h1.page-title::text'
+        ).get().split()
+        data = {
+            'number': number,
+            'name': ' '.join(name).strip(),
+            'status': response.css(
+                'dt:contains("Status")+dd abbr::text'
+            ).get(),
         }
+        yield PepParseItem(data)
