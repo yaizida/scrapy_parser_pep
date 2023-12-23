@@ -18,7 +18,7 @@ class PepSpider(scrapy.Spider):
 
     def parse_pep(self, response):
         """парсит страницы с документами и формирует Items."""
-        _, number, _, *name = response.css(
+        number, _, *name = response.css(
             'h1.page-title::text'
         ).get().split()
         data = {

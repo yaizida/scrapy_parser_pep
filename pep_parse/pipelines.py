@@ -14,12 +14,12 @@ class PepParsePipeline:
 
     def process_item(self, item, spider):
         adapter = ItemAdapter(item)
-        if adapter.setdefault('status'):
-            pep_status = adapter['status']
-            self.__status_vocabulary[pep_status] = (
-                self.__status_vocabulary.get(pep_status, 0) + 1
-            )
-            return item
+        adapter.setdefault('status')
+        pep_status = adapter['status']
+        self.__status_vocabulary[pep_status] = (
+            self.__status_vocabulary.get(pep_status, 0) + 1
+        )
+        return item
 
     def close_spider(self, spider):
         RESULT_DIR = BASE_DIR / RESULTS
